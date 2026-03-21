@@ -616,42 +616,48 @@
   }
 
   // ── Timer ──
+  // totalOffset / splitOffset accumulate ms across pause segments.
+  // segStart is when the current running segment began.
+  // On attempt: totalOffset absorbs the current segment, splitOffset resets to 0.
   const timer = {
-    state: 'idle',       // 'idle' | 'running' | 'stopped'
-    startTime: null,     // Date.now() when started
-    lastAttemptTime: null, // Date.now() of last attempt, null = none yet
+    running: false,
+    totalOffset: 0,
+    splitOffset: 0,
+    segStart: null,
+    hasAttempt: false,
     intervalId: null,
   };
 
   function handleTimerBtn() {
-    if (timer.state === 'idle' || timer.state === 'stopped') {
-      // Start / restart
-      timer.startTime = Date.now();
-      timer.lastAttemptTime = null;
-      timer.state = 'running';
+    const btn = document.getElementById('timer-btn');
+    const disp = document.getElementById('timer-display');
+    if (!timer.running) {
+      timer.segStart = Date.now();
+      timer.running = true;
       timer.intervalId = setInterval(tickTimer, 500);
-      document.getElementById('timer-btn').textContent = 'Stop';
-      document.getElementById('timer-display').classList.replace('stopped', 'running');
+      btn.textContent = 'Pause';
+      disp.classList.replace('stopped', 'running');
       tickTimer();
     } else {
-      // Stop → freeze display
+      const now = Date.now();
+      timer.totalOffset += now - timer.segStart;
+      timer.splitOffset += now - timer.segStart;
+      timer.running = false;
       clearInterval(timer.intervalId);
-      timer.state = 'stopped';
-      document.getElementById('timer-btn').textContent = 'Reset';
-      document.getElementById('timer-display').classList.replace('running', 'stopped');
+      btn.textContent = 'Resume';
+      disp.classList.replace('running', 'stopped');
     }
   }
 
   function tickTimer() {
     const now = Date.now();
-    const total = now - timer.startTime;
-    const display = document.getElementById('timer-display');
-    if (timer.lastAttemptTime !== null) {
-      const split = now - timer.lastAttemptTime;
-      display.textContent = `${fmtTime(split)} / ${fmtTime(total)}`;
-    } else {
-      display.textContent = fmtTime(total);
-    }
+    const seg = now - timer.segStart;
+    const total = timer.totalOffset + seg;
+    const split = timer.splitOffset + seg;
+    const disp = document.getElementById('timer-display');
+    disp.textContent = timer.hasAttempt
+      ? `${fmtTime(split)} / ${fmtTime(total)}`
+      : fmtTime(total);
   }
 
   function fmtTime(ms) {
@@ -668,10 +674,16 @@
     entry.attempts += 1;
     boulder.attempts += 1;
 
-    if (timer.state === 'running') {
-      timer.lastAttemptTime = Date.now();
-      tickTimer();
+    if (timer.running) {
+      const now = Date.now();
+      timer.totalOffset += now - timer.segStart;
+      timer.splitOffset = 0;
+      timer.segStart = now;
+    } else {
+      timer.splitOffset = 0;
     }
+    timer.hasAttempt = true;
+    tickTimer();
 
     renderSession();
     renderBoulders();
