@@ -601,7 +601,7 @@
           <div class="session-card-grade">${escHtml(boulder.grade)}</div>
         </div>
         <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/${state.settings.maxAttempts}</span>
-        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed ? ' disabled' : ''}>Add attempt</button>
+        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed || isTimerRed() ? ' disabled' : ''}>Add attempt</button>
         <label class="sent-row" style="${entry.attempts === 0 ? 'opacity:0.38;cursor:default' : ''}">
           <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} ${entry.attempts === 0 ? 'disabled' : ''} />
           Sent
@@ -692,25 +692,35 @@
     intervalId: null,
   };
 
-  function handleTimerBtn() {
+  function startTimer() {
     const btn = document.getElementById('timer-btn');
     const disp = document.getElementById('timer-display');
+    timer.segStart = Date.now();
+    timer.running = true;
+    timer.intervalId = setInterval(tickTimer, 500);
+    btn.textContent = 'Pause';
+    disp.classList.replace('stopped', 'running');
+    tickTimer();
+  }
+
+  function handleTimerBtn() {
     if (!timer.running) {
-      timer.segStart = Date.now();
-      timer.running = true;
-      timer.intervalId = setInterval(tickTimer, 500);
-      btn.textContent = 'Pause';
-      disp.classList.replace('stopped', 'running');
-      tickTimer();
+      startTimer();
     } else {
       const now = Date.now();
       timer.totalOffset += now - timer.segStart;
       timer.splitOffset += now - timer.segStart;
       timer.running = false;
       clearInterval(timer.intervalId);
-      btn.textContent = 'Resume';
-      disp.classList.replace('running', 'stopped');
+      document.getElementById('timer-btn').textContent = 'Resume';
+      document.getElementById('timer-display').classList.replace('running', 'stopped');
     }
+  }
+
+  function isTimerRed() {
+    if (!timer.hasAttempt) return false;
+    const seg = timer.running ? Date.now() - timer.segStart : 0;
+    return (timer.splitOffset + seg) < state.settings.restMinutes * 60 * 1000;
   }
 
   function tickTimer() {
@@ -728,6 +738,9 @@
     const splitColor = split >= restMs ? '#16a34a' : '#dc2626';
     const emoji = split >= restMs ? '🧗' : '😴';
     disp.innerHTML = `<span style="color:${splitColor}">${emoji} ${fmtTime(split)}</span> <span style="color:#9b9b9b">/ ${fmtTime(total)}</span>`;
+
+    // Keep attempt buttons in sync with red/green state
+    renderSession();
   }
 
   function fmtTime(ms) {
@@ -740,6 +753,7 @@
     const entry = state.session.find(e => e.boulderId === boulderId);
     const boulder = state.boulders.find(b => b.id === boulderId);
     if (!entry || !boulder || entry.attempts >= state.settings.maxAttempts) return;
+    if (isTimerRed()) return;
 
     entry.attempts += 1;
     boulder.attempts += 1;
@@ -751,6 +765,7 @@
       timer.segStart = now;
     } else {
       timer.splitOffset = 0;
+      startTimer();
     }
     timer.hasAttempt = true;
     tickTimer();
