@@ -189,13 +189,28 @@
       margin-bottom: 4px;
     }
 
-    /* ── Timer ── */
-    .timer-wrap {
+    /* ── Timer section ── */
+    .timer-section {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
+      background: #fff;
+      border: 1px solid #e8e8e6;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
     }
 
+    .timer-section-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #9b9b9b;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      flex: 1;
+    }
+
+    /* ── Timer ── */
     .timer-display {
       font-size: 14px;
       font-weight: 600;
@@ -388,11 +403,12 @@
         <h2>Today's Session</h2>
         <p>Log attempts on your projects.</p>
       </div>
-      <div class="timer-wrap">
-        <span id="timer-display" class="timer-display stopped">0:00</span>
-        <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
-        <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
-      </div>
+      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
+    </div>
+    <div class="timer-section">
+      <span class="timer-section-label">Time tracking</span>
+      <span id="timer-display" class="timer-display stopped">0:00</span>
+      <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
     </div>
     <div id="session-empty" class="table-wrap">
       <div class="empty-state">
