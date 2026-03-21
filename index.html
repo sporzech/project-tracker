@@ -189,6 +189,25 @@
       margin-bottom: 4px;
     }
 
+    /* ── Timer ── */
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-display {
+      font-size: 14px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: #1a1a1a;
+      letter-spacing: 0.01em;
+      min-width: 52px;
+    }
+
+    .timer-display.running { color: #1a1a1a; }
+    .timer-display.stopped { color: #9b9b9b; }
+
     /* ── Sessions ── */
     .session-boulders { display: flex; flex-direction: column; gap: 10px; }
 
@@ -369,7 +388,11 @@
         <h2>Today's Session</h2>
         <p>Log attempts on your projects.</p>
       </div>
-      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
+      <div class="timer-wrap">
+        <span id="timer-display" class="timer-display stopped">0:00</span>
+        <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
+        <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
+      </div>
     </div>
     <div id="session-empty" class="table-wrap">
       <div class="empty-state">
@@ -576,6 +599,50 @@
     renderBoulders();
   }
 
+  // ── Timer ──
+  const timer = {
+    state: 'idle',       // 'idle' | 'running' | 'stopped'
+    startTime: null,     // Date.now() when started
+    lastAttemptTime: null, // Date.now() of last attempt, null = none yet
+    intervalId: null,
+  };
+
+  function handleTimerBtn() {
+    if (timer.state === 'idle' || timer.state === 'stopped') {
+      // Start / restart
+      timer.startTime = Date.now();
+      timer.lastAttemptTime = null;
+      timer.state = 'running';
+      timer.intervalId = setInterval(tickTimer, 500);
+      document.getElementById('timer-btn').textContent = 'Stop';
+      document.getElementById('timer-display').classList.replace('stopped', 'running');
+      tickTimer();
+    } else {
+      // Stop → freeze display
+      clearInterval(timer.intervalId);
+      timer.state = 'stopped';
+      document.getElementById('timer-btn').textContent = 'Reset';
+      document.getElementById('timer-display').classList.replace('running', 'stopped');
+    }
+  }
+
+  function tickTimer() {
+    const now = Date.now();
+    const total = now - timer.startTime;
+    const display = document.getElementById('timer-display');
+    if (timer.lastAttemptTime !== null) {
+      const split = now - timer.lastAttemptTime;
+      display.textContent = `${fmtTime(split)} / ${fmtTime(total)}`;
+    } else {
+      display.textContent = fmtTime(total);
+    }
+  }
+
+  function fmtTime(ms) {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
   // ── Attempt logging ──
   function addAttempt(boulderId) {
     const entry = state.session.find(e => e.boulderId === boulderId);
@@ -584,6 +651,11 @@
 
     entry.attempts += 1;
     boulder.attempts += 1;
+
+    if (timer.state === 'running') {
+      timer.lastAttemptTime = Date.now();
+      tickTimer();
+    }
 
     renderSession();
     renderBoulders();
