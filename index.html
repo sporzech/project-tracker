@@ -189,6 +189,29 @@
       margin-bottom: 4px;
     }
 
+    /* ── Session title + gear ── */
+    .session-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gear-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 3px;
+      border-radius: 5px;
+      color: #9b9b9b;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .session-title-wrap:hover .gear-btn { opacity: 1; }
+    .gear-btn:hover { color: #1a1a1a; background: #f3f3f1; }
+
     /* ── Timer section ── */
     .timer-section {
       display: flex;
@@ -400,7 +423,12 @@
   <div id="tab-sessions" class="tab-panel">
     <div class="section-header">
       <div>
-        <h2>Today's Session</h2>
+        <div class="session-title-wrap">
+          <h2>Today's Session</h2>
+          <button class="gear-btn" onclick="openSessionSettings()" title="Session settings">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
         <p>Log attempts on your projects.</p>
       </div>
       <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
@@ -439,6 +467,31 @@
   </div>
 </dialog>
 
+<!-- Session settings dialog -->
+<dialog id="session-settings-dialog">
+  <div class="dialog-inner">
+    <div class="dialog-title">Session settings</div>
+    <div class="field">
+      <label for="setting-max-attempts">Max attempts</label>
+      <select id="setting-max-attempts"></select>
+    </div>
+    <div class="field">
+      <label for="setting-rest-time">Rest time</label>
+      <select id="setting-rest-time">
+        <option value="1">1 minute</option>
+        <option value="2">2 minutes</option>
+        <option value="3" selected>3 minutes</option>
+        <option value="4">4 minutes</option>
+        <option value="5">5 minutes</option>
+      </select>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('session-settings-dialog').close()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSessionSettings()">Save</button>
+    </div>
+  </div>
+</dialog>
+
 <!-- Add to session dialog -->
 <dialog id="add-session-dialog">
   <div class="dialog-inner">
@@ -459,7 +512,18 @@
   const state = {
     boulders: [],   // { id, name, grade, attempts, sessions, sent }
     session: [],    // { boulderId, attempts, sent }
+    settings: { maxAttempts: 5, restMinutes: 3 },
   };
+
+  // ── Populate max attempts dropdown ──
+  const maxAttemptsSelect = document.getElementById('setting-max-attempts');
+  for (let i = 1; i <= 9; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    if (i === 5) opt.selected = true;
+    maxAttemptsSelect.appendChild(opt);
+  }
 
   // ── Populate grade dropdown ──
   const gradeSelect = document.getElementById('input-grade');
@@ -529,14 +593,14 @@
       const card = document.createElement('div');
       card.className = 'session-card' + (entry.sent ? ' sent' : '');
 
-      const maxed = entry.attempts >= 5;
+      const maxed = entry.attempts >= state.settings.maxAttempts;
 
       card.innerHTML = `
         <div class="session-card-info">
           <div class="session-card-name">${escHtml(boulder.name)}</div>
           <div class="session-card-grade">${escHtml(boulder.grade)}</div>
         </div>
-        <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/5</span>
+        <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/${state.settings.maxAttempts}</span>
         <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed ? ' disabled' : ''}>Add attempt</button>
         <label class="sent-row" style="${entry.attempts === 0 ? 'opacity:0.38;cursor:default' : ''}">
           <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} ${entry.attempts === 0 ? 'disabled' : ''} />
@@ -660,8 +724,9 @@
       return;
     }
 
-    const splitColor = split >= 3 * 60 * 1000 ? '#16a34a' : '#dc2626';
-    const emoji = split >= 3 * 60 * 1000 ? '🧗' : '😴';
+    const restMs = state.settings.restMinutes * 60 * 1000;
+    const splitColor = split >= restMs ? '#16a34a' : '#dc2626';
+    const emoji = split >= restMs ? '🧗' : '😴';
     disp.innerHTML = `<span style="color:${splitColor}">${emoji} ${fmtTime(split)}</span> <span style="color:#9b9b9b">/ ${fmtTime(total)}</span>`;
   }
 
@@ -674,7 +739,7 @@
   function addAttempt(boulderId) {
     const entry = state.session.find(e => e.boulderId === boulderId);
     const boulder = state.boulders.find(b => b.id === boulderId);
-    if (!entry || !boulder || entry.attempts >= 5) return;
+    if (!entry || !boulder || entry.attempts >= state.settings.maxAttempts) return;
 
     entry.attempts += 1;
     boulder.attempts += 1;
@@ -705,6 +770,20 @@
 
     renderSession();
     renderBoulders();
+  }
+
+  // ── Session settings ──
+  function openSessionSettings() {
+    document.getElementById('setting-max-attempts').value = state.settings.maxAttempts;
+    document.getElementById('setting-rest-time').value = state.settings.restMinutes;
+    document.getElementById('session-settings-dialog').showModal();
+  }
+
+  function saveSessionSettings() {
+    state.settings.maxAttempts = parseInt(document.getElementById('setting-max-attempts').value, 10);
+    state.settings.restMinutes = parseInt(document.getElementById('setting-rest-time').value, 10);
+    document.getElementById('session-settings-dialog').close();
+    renderSession();
   }
 
   // ── Enter submits add-boulder dialog ──
