@@ -169,6 +169,11 @@
       color: #16a34a;
     }
 
+    .status-flashed {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
     .empty-state {
       padding: 52px 24px;
       text-align: center;
@@ -450,9 +455,11 @@
         <td><span class="grade-badge">${escHtml(b.grade)}</span></td>
         <td>${b.attempts}</td>
         <td>${b.sessions}</td>
-        <td>${b.sent
-          ? '<span class="status-badge status-sent">Sent</span>'
-          : '<span class="status-badge status-projecting">Projecting</span>'
+        <td>${b.sent && b.attempts === 1
+          ? '<span class="status-badge status-flashed">Flashed</span>'
+          : b.sent
+            ? '<span class="status-badge status-sent">Sent</span>'
+            : '<span class="status-badge status-projecting">Projecting</span>'
         }</td>
       `;
       tbody.appendChild(tr);
