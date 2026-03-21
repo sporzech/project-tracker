@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9f9f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e6;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      height: 56px;
+    }
+
+    .logo {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+    }
+
+    .logo span { color: #6b6b6b; font-weight: 400; }
+
+    nav { display: flex; gap: 4px; }
+
+    nav button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #6b6b6b;
+      font-weight: 500;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    nav button:hover { background: #f3f3f1; color: #1a1a1a; }
+    nav button.active { background: #f3f3f1; color: #1a1a1a; }
+
+    /* ── Main content ── */
+    main { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      font-size: 13px;
+      color: #6b6b6b;
+      margin-top: 2px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background 0.12s, opacity 0.12s;
+    }
+
+    .btn-primary {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #333; }
+
+    .btn-ghost {
+      background: none;
+      color: #1a1a1a;
+      border: 1px solid #e8e8e6;
+    }
+    .btn-ghost:hover { background: #f3f3f1; }
+
+    .btn:disabled { opacity: 0.38; cursor: default; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: #fff;
+      border: 1px solid #e8e8e6;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 11px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #9b9b9b;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e8e8e6;
+      background: #fafaf9;
+    }
+
+    tbody tr { border-bottom: 1px solid #f0f0ee; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafaf9; }
+
+    tbody td {
+      padding: 13px 16px;
+      vertical-align: middle;
+    }
+
+    .grade-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #f3f3f1;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a4a4a;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-projecting {
+      background: #fff7ed;
+      color: #c2610c;
+    }
+
+    .status-sent {
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+
+    .empty-state {
+      padding: 52px 24px;
+      text-align: center;
+      color: #9b9b9b;
+      font-size: 14px;
+    }
+
+    .empty-state strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      color: #6b6b6b;
+      margin-bottom: 4px;
+    }
+
+    /* ── Sessions ── */
+    .session-boulders { display: flex; flex-direction: column; gap: 10px; }
+
+    .session-card {
+      background: #fff;
+      border: 1px solid #e8e8e6;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .session-card.sent {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .session-card-info { flex: 1; min-width: 0; }
+
+    .session-card-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-card-grade {
+      font-size: 12px;
+      color: #9b9b9b;
+      margin-top: 2px;
+    }
+
+    .attempt-counter {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a4a4a;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .attempt-counter.maxed { color: #16a34a; }
+
+    .sent-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #4a4a4a;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .sent-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #16a34a;
+    }
+
+    /* ── Dialog ── */
+    dialog {
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.06);
+      width: 380px;
+      max-width: calc(100vw - 32px);
+    }
+
+    dialog::backdrop { background: rgba(0,0,0,0.3); }
+
+    .dialog-inner { padding: 24px; }
+
+    .dialog-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b6b6b;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #e8e8e6;
+      border-radius: 7px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #a0a0a0;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Project Tracker <span>/ Bouldering</span></div>
+  <nav>
+    <button class="active" onclick="switchTab('boulders', this)">Boulders</button>
+    <button onclick="switchTab('sessions', this)">Sessions</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Boulders tab -->
+  <div id="tab-boulders" class="tab-panel active">
+    <div class="section-header">
+      <div>
+        <h2>My Projects</h2>
+        <p>Track boulders you're working on.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAddBoulderDialog()">+ Add boulder</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Grade</th>
+            <th>Attempts</th>
+            <th>Sessions</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="boulders-tbody">
+          <tr id="boulders-empty">
+            <td colspan="5">
+              <div class="empty-state">
+                <strong>No boulders yet</strong>
+                Add your first project to get started.
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Sessions tab -->
+  <div id="tab-sessions" class="tab-panel">
+    <div class="section-header">
+      <div>
+        <h2>Today's Session</h2>
+        <p>Log attempts on your projects.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
+    </div>
+    <div id="session-empty" class="table-wrap">
+      <div class="empty-state">
+        <strong>Session is empty</strong>
+        Add a boulder to start logging attempts.
+      </div>
+    </div>
+    <div id="session-boulders" class="session-boulders"></div>
+  </div>
+</main>
+
+<!-- Add boulder dialog -->
+<dialog id="add-boulder-dialog">
+  <div class="dialog-inner">
+    <div class="dialog-title">Add boulder</div>
+    <div class="field">
+      <label for="input-name">Name</label>
+      <input id="input-name" type="text" placeholder="e.g. The Mandala" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="input-grade">Grade</label>
+      <select id="input-grade"></select>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" onclick="closeAddBoulderDialog()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddBoulder()">Add boulder</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Add to session dialog -->
+<dialog id="add-session-dialog">
+  <div class="dialog-inner">
+    <div class="dialog-title">Add to session</div>
+    <div class="field">
+      <label for="select-boulder">Boulder</label>
+      <select id="select-boulder"></select>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('add-session-dialog').close()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddToSession()">Add to session</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // ── State ──
+  const state = {
+    boulders: [],   // { id, name, grade, attempts, sessions, sent }
+    session: [],    // { boulderId, attempts, sent }
+  };
+
+  // ── Populate grade dropdown ──
+  const gradeSelect = document.getElementById('input-grade');
+  for (let i = 0; i <= 17; i++) {
+    const opt = document.createElement('option');
+    opt.value = `V${i}`;
+    opt.textContent = `V${i}`;
+    gradeSelect.appendChild(opt);
+  }
+
+  // ── Tab switching ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── Render boulders table ──
+  function renderBoulders() {
+    const tbody = document.getElementById('boulders-tbody');
+    const empty = document.getElementById('boulders-empty');
+
+    tbody.querySelectorAll('tr.data-row').forEach(r => r.remove());
+
+    if (state.boulders.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    state.boulders.forEach(b => {
+      const tr = document.createElement('tr');
+      tr.className = 'data-row';
+      tr.innerHTML = `
+        <td>${escHtml(b.name)}</td>
+        <td><span class="grade-badge">${escHtml(b.grade)}</span></td>
+        <td>${b.attempts}</td>
+        <td>${b.sessions}</td>
+        <td>${b.sent
+          ? '<span class="status-badge status-sent">Sent</span>'
+          : '<span class="status-badge status-projecting">Projecting</span>'
+        }</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ── Render session ──
+  function renderSession() {
+    const container = document.getElementById('session-boulders');
+    const empty = document.getElementById('session-empty');
+    container.innerHTML = '';
+
+    if (state.session.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    state.session.forEach(entry => {
+      const boulder = state.boulders.find(b => b.id === entry.boulderId);
+      if (!boulder) return;
+
+      const card = document.createElement('div');
+      card.className = 'session-card' + (entry.sent ? ' sent' : '');
+
+      const maxed = entry.attempts >= 5;
+
+      card.innerHTML = `
+        <div class="session-card-info">
+          <div class="session-card-name">${escHtml(boulder.name)}</div>
+          <div class="session-card-grade">${escHtml(boulder.grade)}</div>
+        </div>
+        <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/5</span>
+        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed ? ' disabled' : ''}>Add attempt</button>
+        <label class="sent-row">
+          <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} />
+          Sent
+        </label>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  // ── Add boulder dialog ──
+  function openAddBoulderDialog() {
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-grade').value = 'V0';
+    document.getElementById('add-boulder-dialog').showModal();
+    setTimeout(() => document.getElementById('input-name').focus(), 50);
+  }
+
+  function closeAddBoulderDialog() {
+    document.getElementById('add-boulder-dialog').close();
+  }
+
+  function confirmAddBoulder() {
+    const name = document.getElementById('input-name').value.trim();
+    const grade = document.getElementById('input-grade').value;
+    if (!name) {
+      document.getElementById('input-name').focus();
+      return;
+    }
+    state.boulders.push({ id: uid(), name, grade, attempts: 0, sessions: 0, sent: false });
+    closeAddBoulderDialog();
+    renderBoulders();
+  }
+
+  // ── Add to session dialog ──
+  function openAddToSessionDialog() {
+    const sel = document.getElementById('select-boulder');
+    sel.innerHTML = '';
+
+    const inSession = new Set(state.session.map(e => e.boulderId));
+    const available = state.boulders.filter(b => !inSession.has(b.id));
+
+    if (available.length === 0) {
+      const opt = document.createElement('option');
+      opt.textContent = state.boulders.length === 0
+        ? 'No boulders — add one in the Boulders tab'
+        : 'All boulders already in session';
+      opt.disabled = true;
+      sel.appendChild(opt);
+    } else {
+      available.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = `${b.name} (${b.grade})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    document.getElementById('add-session-dialog').showModal();
+  }
+
+  function confirmAddToSession() {
+    const sel = document.getElementById('select-boulder');
+    const boulderId = sel.value;
+    if (!boulderId) return;
+
+    const boulder = state.boulders.find(b => b.id === boulderId);
+    if (!boulder) return;
+
+    state.session.push({ boulderId, attempts: 0, sent: false });
+    boulder.sessions += 1;
+
+    document.getElementById('add-session-dialog').close();
+    renderSession();
+    renderBoulders();
+  }
+
+  // ── Attempt logging ──
+  function addAttempt(boulderId) {
+    const entry = state.session.find(e => e.boulderId === boulderId);
+    const boulder = state.boulders.find(b => b.id === boulderId);
+    if (!entry || !boulder || entry.attempts >= 5) return;
+
+    entry.attempts += 1;
+    boulder.attempts += 1;
+
+    renderSession();
+    renderBoulders();
+  }
+
+  // ── Mark as sent ──
+  function toggleSent(boulderId, isSent) {
+    const entry = state.session.find(e => e.boulderId === boulderId);
+    const boulder = state.boulders.find(b => b.id === boulderId);
+    if (!entry || !boulder) return;
+
+    entry.sent = isSent;
+    boulder.sent = isSent;
+
+    renderSession();
+    renderBoulders();
+  }
+
+  // ── Enter submits add-boulder dialog ──
+  document.getElementById('input-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmAddBoulder();
+  });
+
+  // ── Helpers ──
+  function uid() {
+    return Math.random().toString(36).slice(2, 10);
+  }
+
+  function escHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Init ──
+  renderBoulders();
+  renderSession();
+</script>
+</body>
+</html>
