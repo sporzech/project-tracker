@@ -222,6 +222,8 @@
 
     .timer-display.running { color: #1a1a1a; }
     .timer-display.stopped { color: #9b9b9b; }
+    .timer-display.timer-red { color: #dc2626; }
+    .timer-display.timer-green { color: #16a34a; }
 
     /* ── Sessions ── */
     .session-boulders { display: flex; flex-direction: column; gap: 10px; }
@@ -650,14 +652,27 @@
   }
 
   function tickTimer() {
-    const now = Date.now();
-    const seg = now - timer.segStart;
+    const seg = timer.running ? Date.now() - timer.segStart : 0;
     const total = timer.totalOffset + seg;
     const split = timer.splitOffset + seg;
     const disp = document.getElementById('timer-display');
-    disp.textContent = timer.hasAttempt
+
+    let text = timer.hasAttempt
       ? `${fmtTime(split)} / ${fmtTime(total)}`
       : fmtTime(total);
+
+    disp.classList.remove('timer-red', 'timer-green');
+    if (timer.hasAttempt) {
+      if (split >= 3 * 60 * 1000) {
+        disp.classList.add('timer-green');
+        text = '🧗 ' + text;
+      } else {
+        disp.classList.add('timer-red');
+        text = '😴 ' + text;
+      }
+    }
+
+    disp.textContent = text;
   }
 
   function fmtTime(ms) {
