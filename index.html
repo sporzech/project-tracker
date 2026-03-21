@@ -635,7 +635,7 @@
     <div class="dialog-title">Add project</div>
     <div class="field">
       <label for="input-name">Name</label>
-      <input id="input-name" type="text" placeholder="e.g. The Mandala" autocomplete="off" />
+      <input id="input-name" type="text" placeholder="e.g. The Mandala" autocomplete="off" autocorrect="off" autocapitalize="off" />
     </div>
     <div class="field">
       <label for="input-grade">Grade</label>
@@ -810,7 +810,15 @@
   }
 
   function closeAddBoulderDialog() {
+    document.getElementById('input-name').blur();
     document.getElementById('add-boulder-dialog').close();
+    resetViewportZoom();
+  }
+
+  function resetViewportZoom() {
+    const meta = document.querySelector('meta[name="viewport"]');
+    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
+    setTimeout(() => { meta.content = 'width=device-width, initial-scale=1'; }, 300);
   }
 
   function confirmAddBoulder() {
