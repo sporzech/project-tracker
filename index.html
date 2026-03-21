@@ -45,7 +45,6 @@
       padding: 0 28px;
       display: flex;
       align-items: center;
-      gap: 24px;
       height: 48px;
       position: sticky;
       top: 0;
@@ -53,32 +52,42 @@
     }
 
     .logo {
-      font-size: 13.5px;
-      font-weight: 500;
+      font-size: 17px;
+      font-weight: 700;
       color: var(--text);
-      letter-spacing: -0.01em;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    .logo span { color: var(--text-2); font-weight: 400; }
+    /* ── Tab nav row ── */
+    .tab-nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      position: sticky;
+      top: 48px;
+      z-index: 9;
+    }
 
-    nav { display: flex; gap: 2px; }
-
-    nav button {
+    .tab-nav button {
+      flex: 1;
       background: none;
       border: none;
+      border-bottom: 2px solid transparent;
       cursor: pointer;
-      padding: 5px 10px;
-      border-radius: 5px;
+      padding: 10px;
       font-size: 13.5px;
       font-family: inherit;
       color: var(--text-2);
       font-weight: 500;
       letter-spacing: -0.01em;
-      transition: background 0.1s, color 0.1s;
+      transition: color 0.1s, border-color 0.1s;
     }
 
-    nav button:hover { background: var(--bg-hover); color: var(--text); }
-    nav button.active { background: var(--bg-hover); color: var(--text); }
+    .tab-nav button:hover { color: var(--text); }
+    .tab-nav button.active { color: var(--text); border-bottom-color: var(--text); }
 
     /* ── Main content ── */
     main { max-width: 840px; margin: 0 auto; padding: 48px 32px; }
@@ -226,16 +235,14 @@
       background: none;
       border: none;
       cursor: pointer;
-      padding: 3px;
+      padding: 3px 6px;
       border-radius: 4px;
       color: var(--text-3);
       display: flex;
       align-items: center;
-      opacity: 0;
-      transition: opacity 0.12s, color 0.12s, background 0.12s;
+      transition: color 0.12s, background 0.12s;
     }
 
-    .session-title-wrap:hover .gear-btn { opacity: 1; }
     .gear-btn:hover { color: var(--text); background: var(--bg-hover); }
 
     /* ── Timer section ── */
@@ -278,19 +285,28 @@
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 13px 18px;
       display: flex;
       align-items: center;
       gap: 14px;
+      padding: 13px 18px;
       transition: border-color 0.15s, background 0.15s;
     }
 
-    .session-card.sent {
-      border-color: #b7dfb0;
-      background: var(--green-bg);
-    }
+    .session-card.sent    { border-color: #b7dfb0; background: var(--green-bg); }
+    .session-card.flashed { border-color: #a8c4e0; background: var(--blue-bg); }
 
-    .session-card-info { flex: 1; min-width: 0; }
+    /* On desktop, dissolve the header/actions wrappers into the flat flex row */
+    .session-card-header { display: contents; }
+    .session-card-actions { display: contents; }
+
+    .session-card-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+      order: 1;
+    }
 
     .session-card-name {
       font-size: 13.5px;
@@ -302,18 +318,16 @@
       letter-spacing: -0.01em;
     }
 
-    .session-card-grade {
-      font-size: 12px;
-      color: var(--text-3);
-      margin-top: 2px;
-    }
+    /* attempts-section, button, sent-row ordered after info */
+    .attempts-section { order: 2; display: flex; align-items: center; gap: 6px; }
+    .attempts-label   { display: none; } /* hidden on desktop */
+    .session-card .btn { order: 3; }
+    .sent-row { order: 4; }
 
     .attempt-counter {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text-2);
-      min-width: 36px;
-      text-align: center;
       font-variant-numeric: tabular-nums;
     }
 
@@ -390,6 +404,13 @@
       letter-spacing: -0.01em;
       transition: border-color 0.12s, box-shadow 0.12s;
     }
+    .field select {
+      appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
 
     .field input::placeholder { color: var(--text-3); }
 
@@ -407,27 +428,147 @@
       padding-top: 16px;
       border-top: 1px solid var(--border-light);
     }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      header {
+        padding: 0 16px;
+      }
+
+      main {
+        padding: 24px 16px;
+      }
+
+      .section-header {
+        margin-bottom: 16px;
+      }
+
+
+      /* Boulders table → card layout */
+      #tab-boulders thead { display: none; }
+
+      #tab-boulders tbody tr.data-row {
+        display: grid;
+        grid-template-columns: auto auto 1fr auto;
+        grid-template-rows: auto auto auto;
+        column-gap: 8px;
+        row-gap: 2px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      #tab-boulders tbody tr.data-row:last-child { border-bottom: none; }
+      #tab-boulders tbody tr.data-row:hover { background: var(--bg); }
+
+      #tab-boulders tbody td {
+        display: block;
+        padding: 0;
+        border: none;
+      }
+
+      /* Row 1: Name | Grade | (spacer) | Status */
+      #tab-boulders tbody td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 500; align-self: center; }
+      #tab-boulders tbody td:nth-child(2) { grid-column: 2; grid-row: 1; align-self: center; }
+      #tab-boulders tbody td:nth-child(5) { grid-column: 4; grid-row: 1; align-self: center; }
+
+      /* Rows 2–3: Attempts then Sessions, stacked, slightly indented */
+      #tab-boulders tbody td:nth-child(3) { grid-column: 1 / span 4; grid-row: 2; font-size: 12px; color: var(--text-2); padding-left: 10px; margin-top: 6px; }
+      #tab-boulders tbody td:nth-child(4) { grid-column: 1 / span 4; grid-row: 3; font-size: 12px; color: var(--text-2); padding-left: 10px; }
+
+      #tab-boulders tbody td:nth-child(3)::before,
+      #tab-boulders tbody td:nth-child(4)::before {
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 4px;
+      }
+
+      #tab-boulders tbody td:nth-child(3)::before { content: "Attempts"; }
+      #tab-boulders tbody td:nth-child(4)::before { content: "Sessions"; }
+
+      /* Session cards: restore two-section layout on mobile */
+      .session-card {
+        display: block;
+        overflow: hidden;
+        padding: 0;
+        background: var(--bg-subtle);
+      }
+
+      .session-card.sent    { background: var(--green-bg); }
+      .session-card.sent .session-card-header    { background: var(--green-bg); }
+      .session-card.flashed { background: var(--blue-bg); }
+      .session-card.flashed .session-card-header { background: var(--blue-bg); }
+
+      .session-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+      }
+
+      .session-card-info { order: unset; flex: unset; }
+      .sent-row { order: unset; }
+
+      .session-card-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 14px;
+        background: var(--bg);
+        border-top: 1px solid var(--border-light);
+      }
+
+      .attempts-section {
+        order: unset;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+      }
+      .attempts-label {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--text-3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .attempts-section .attempt-counter {
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+      .session-card .btn { order: unset; }
+
+      .timer-section {
+        padding: 10px 14px;
+      }
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Project Tracker <span>/ Bouldering</span></div>
-  <nav>
-    <button class="active" onclick="switchTab('boulders', this)">Boulders</button>
-    <button onclick="switchTab('sessions', this)">Sessions</button>
-  </nav>
+  <div class="logo">🪨 <span><span style="color:var(--red);font-weight:800">Red</span>point</span></div>
 </header>
+<div class="tab-nav">
+  <button class="active" onclick="switchTab('boulders', this)">Projects</button>
+  <button onclick="switchTab('sessions', this)">Sessions</button>
+</div>
 
 <main>
   <!-- Boulders tab -->
   <div id="tab-boulders" class="tab-panel active">
     <div class="section-header">
       <div>
-        <h2>My Projects</h2>
-        <p>Track boulders you're working on.</p>
+        <h2>Projects</h2>
+        <p>Track boulders you're working on</p>
       </div>
-      <button class="btn btn-primary" onclick="openAddBoulderDialog()">+ Add boulder</button>
+      <button class="btn btn-primary" onclick="openAddBoulderDialog()">+ Add project</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -444,8 +585,8 @@
           <tr id="boulders-empty">
             <td colspan="5">
               <div class="empty-state">
-                <strong>No boulders yet</strong>
-                Add your first project to get started.
+                <strong>No projects yet</strong>
+                Click <span style="font-weight:600;color:var(--text-2)">Add project</span> to get started
               </div>
             </td>
           </tr>
@@ -459,14 +600,14 @@
     <div class="section-header">
       <div>
         <div class="session-title-wrap">
-          <h2>Today's Session</h2>
+          <h2>Today's session</h2>
           <button class="gear-btn" onclick="openSessionSettings()" title="Session settings">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
-        <p>Log attempts on your projects.</p>
+        <p>Log attempts on your projects</p>
       </div>
-      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add boulder</button>
+      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add project</button>
     </div>
     <div class="timer-section">
       <span class="timer-section-label">Time tracking</span>
@@ -486,7 +627,7 @@
 <!-- Add boulder dialog -->
 <dialog id="add-boulder-dialog">
   <div class="dialog-inner">
-    <div class="dialog-title">Add boulder</div>
+    <div class="dialog-title">Add project</div>
     <div class="field">
       <label for="input-name">Name</label>
       <input id="input-name" type="text" placeholder="e.g. The Mandala" autocomplete="off" />
@@ -497,7 +638,7 @@
     </div>
     <div class="dialog-actions">
       <button class="btn btn-ghost" onclick="closeAddBoulderDialog()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmAddBoulder()">Add boulder</button>
+      <button class="btn btn-primary" onclick="confirmAddBoulder()">Add project</button>
     </div>
   </div>
 </dialog>
@@ -572,7 +713,7 @@
   // ── Tab switching ──
   function switchTab(name, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active'));
     document.getElementById(`tab-${name}`).classList.add('active');
     btn.classList.add('active');
   }
@@ -594,11 +735,11 @@
       const tr = document.createElement('tr');
       tr.className = 'data-row';
       tr.innerHTML = `
-        <td>${escHtml(b.name)}</td>
-        <td><span class="grade-badge">${escHtml(b.grade)}</span></td>
-        <td>${b.attempts}</td>
-        <td>${b.sessions}</td>
-        <td>${b.sent && b.attempts === 1
+        <td data-label="Name">${escHtml(b.name)}</td>
+        <td data-label="Grade"><span class="grade-badge">${escHtml(b.grade)}</span></td>
+        <td data-label="Attempts">${b.attempts}</td>
+        <td data-label="Sessions">${b.sessions}</td>
+        <td data-label="Status">${b.sent && b.attempts === 1
           ? '<span class="status-badge status-flashed">Flashed</span>'
           : b.sent
             ? '<span class="status-badge status-sent">Sent</span>'
@@ -626,21 +767,29 @@
       if (!boulder) return;
 
       const card = document.createElement('div');
-      card.className = 'session-card' + (entry.sent ? ' sent' : '');
+      const flashed = entry.sent && entry.attempts === 1;
+      card.className = 'session-card' + (flashed ? ' flashed' : entry.sent ? ' sent' : '');
 
       const maxed = entry.attempts >= state.settings.maxAttempts;
 
       card.innerHTML = `
-        <div class="session-card-info">
-          <div class="session-card-name">${escHtml(boulder.name)}</div>
-          <div class="session-card-grade">${escHtml(boulder.grade)}</div>
+        <div class="session-card-header">
+          <div class="session-card-info">
+            <div class="session-card-name">${escHtml(boulder.name)}</div>
+            <span class="grade-badge">${escHtml(boulder.grade)}</span>
+          </div>
+          <label class="sent-row" style="${entry.attempts === 0 ? 'opacity:0.38;cursor:default' : ''}">
+            <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} ${entry.attempts === 0 ? 'disabled' : ''} />
+            Sent
+          </label>
         </div>
-        <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/${state.settings.maxAttempts}</span>
-        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed || entry.sent || isTimerRed() ? ' disabled' : ''}>Add attempt</button>
-        <label class="sent-row" style="${entry.attempts === 0 ? 'opacity:0.38;cursor:default' : ''}">
-          <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} ${entry.attempts === 0 ? 'disabled' : ''} />
-          Sent
-        </label>
+        <div class="session-card-actions">
+          <div class="attempts-section">
+            <span class="attempts-label">Attempts</span>
+            <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/${state.settings.maxAttempts}</span>
+          </div>
+          <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed || entry.sent || isTimerRed() ? ' disabled' : ''}>Add attempt</button>
+        </div>
       `;
 
       container.appendChild(card);
