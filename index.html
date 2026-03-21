@@ -601,7 +601,7 @@
           <div class="session-card-grade">${escHtml(boulder.grade)}</div>
         </div>
         <span class="attempt-counter${maxed ? ' maxed' : ''}">${entry.attempts}/${state.settings.maxAttempts}</span>
-        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed || isTimerRed() ? ' disabled' : ''}>Add attempt</button>
+        <button class="btn btn-ghost" onclick="addAttempt('${entry.boulderId}')"${maxed || entry.sent || isTimerRed() ? ' disabled' : ''}>Add attempt</button>
         <label class="sent-row" style="${entry.attempts === 0 ? 'opacity:0.38;cursor:default' : ''}">
           <input type="checkbox" onchange="toggleSent('${entry.boulderId}', this.checked)" ${entry.sent ? 'checked' : ''} ${entry.attempts === 0 ? 'disabled' : ''} />
           Sent
@@ -752,7 +752,7 @@
   function addAttempt(boulderId) {
     const entry = state.session.find(e => e.boulderId === boulderId);
     const boulder = state.boulders.find(b => b.id === boulderId);
-    if (!entry || !boulder || entry.attempts >= state.settings.maxAttempts) return;
+    if (!entry || !boulder || entry.attempts >= state.settings.maxAttempts || entry.sent) return;
     if (isTimerRed()) return;
 
     entry.attempts += 1;
