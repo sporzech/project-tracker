@@ -59,4 +59,3 @@ to last for a single browser session.
 - Sorting or filtering the table
 - Editing or deleting a boulder once added
 - Tracking more than one session
-- Changing the max attempt limit (hardcoded at 5)
