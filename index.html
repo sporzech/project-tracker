@@ -675,7 +675,7 @@
 </dialog>
 
 <!-- Add to session dialog -->
-<dialog id="add-session-dialog">
+<dialog id="add-session-dialog" tabindex="-1">
   <div class="dialog-inner">
     <div class="dialog-title">Add to session</div>
     <div class="field">
@@ -863,7 +863,9 @@
       });
     }
 
-    document.getElementById('add-session-dialog').showModal();
+    const dialog = document.getElementById('add-session-dialog');
+    dialog.showModal();
+    dialog.focus();
   }
 
   function confirmAddToSession() {
