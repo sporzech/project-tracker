@@ -742,11 +742,11 @@
       const tr = document.createElement('tr');
       tr.className = 'data-row';
       tr.innerHTML = `
-        <td data-label="Name">${escHtml(b.name)}</td>
-        <td data-label="Grade"><span class="grade-badge">${escHtml(b.grade)}</span></td>
-        <td data-label="Attempts">${b.attempts}</td>
-        <td data-label="Sessions">${b.sessions}</td>
-        <td data-label="Status">${b.sent && b.attempts === 1
+        <td>${escHtml(b.name)}</td>
+        <td><span class="grade-badge">${escHtml(b.grade)}</span></td>
+        <td>${b.attempts}</td>
+        <td>${b.sessions}</td>
+        <td>${b.sent && b.attempts === 1
           ? '<span class="status-badge status-flashed">Flashed</span>'
           : b.sent
             ? '<span class="status-badge status-sent">Sent</span>'
