@@ -614,7 +614,7 @@
       </div>
       <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add project</button>
     </div>
-    <div class="timer-section">
+    <div id="timer-section" class="timer-section" style="display:none">
       <span class="timer-section-label">Time tracking</span>
       <span id="timer-display" class="timer-display stopped">0:00</span>
       <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
@@ -817,8 +817,12 @@
 
   function resetViewportZoom() {
     const meta = document.querySelector('meta[name="viewport"]');
+    const savedScroll = window.scrollY;
     meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
-    setTimeout(() => { meta.content = 'width=device-width, initial-scale=1'; }, 300);
+    setTimeout(() => {
+      meta.content = 'width=device-width, initial-scale=1';
+      window.scrollTo(0, savedScroll);
+    }, 300);
   }
 
   function confirmAddBoulder() {
@@ -965,6 +969,7 @@
       startTimer();
     }
     timer.hasAttempt = true;
+    document.getElementById('timer-section').style.display = '';
     tickTimer();
 
     renderSession();
