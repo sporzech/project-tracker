@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
+    html { scroll-behavior: auto; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -630,12 +631,12 @@
 </main>
 
 <!-- Add boulder dialog -->
-<dialog id="add-boulder-dialog">
+<dialog id="add-boulder-dialog" tabindex="-1">
   <div class="dialog-inner">
     <div class="dialog-title">Add project</div>
     <div class="field">
       <label for="input-name">Name</label>
-      <input id="input-name" type="text" placeholder="e.g. The Mandala" autocomplete="new-password" autocorrect="off" autocapitalize="off" />
+      <input id="input-name" type="text" placeholder="e.g. The Mandala" name="boulder-name" autocomplete="off" autocorrect="off" autocapitalize="off" />
     </div>
     <div class="field">
       <label for="input-grade">Grade</label>
@@ -649,7 +650,7 @@
 </dialog>
 
 <!-- Session settings dialog -->
-<dialog id="session-settings-dialog">
+<dialog id="session-settings-dialog" tabindex="-1">
   <div class="dialog-inner">
     <div class="dialog-title">Session settings</div>
     <div class="field">
@@ -805,7 +806,9 @@
   function openAddBoulderDialog() {
     document.getElementById('input-name').value = '';
     document.getElementById('input-grade').value = 'V0';
-    document.getElementById('add-boulder-dialog').showModal();
+    const dialog = document.getElementById('add-boulder-dialog');
+    dialog.showModal();
+    dialog.focus();
     setTimeout(() => document.getElementById('input-name').focus(), 50);
   }
 
@@ -820,7 +823,7 @@
     meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
     setTimeout(() => {
       meta.content = 'width=device-width, initial-scale=1';
-      window.scrollTo(0, 0);
+      requestAnimationFrame(() => window.scrollTo(0, 0));
     }, 300);
   }
 
@@ -992,7 +995,9 @@
   function openSessionSettings() {
     document.getElementById('setting-max-attempts').value = state.settings.maxAttempts;
     document.getElementById('setting-rest-time').value = state.settings.restMinutes;
-    document.getElementById('session-settings-dialog').showModal();
+    const dialog = document.getElementById('session-settings-dialog');
+    dialog.showModal();
+    dialog.focus();
   }
 
   function saveSessionSettings() {
