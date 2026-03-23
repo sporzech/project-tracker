@@ -817,11 +817,10 @@
 
   function resetViewportZoom() {
     const meta = document.querySelector('meta[name="viewport"]');
-    const savedScroll = window.scrollY;
     meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
     setTimeout(() => {
       meta.content = 'width=device-width, initial-scale=1';
-      window.scrollTo(0, savedScroll);
+      window.scrollTo(0, 0);
     }, 300);
   }
 
