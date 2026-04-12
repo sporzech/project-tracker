@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Tracker</title>
+  <title>Redpoint</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -46,6 +46,7 @@
       padding: 0 28px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       height: 48px;
       position: sticky;
       top: 0;
@@ -62,39 +63,29 @@
       gap: 7px;
     }
 
-    /* ── Tab nav row ── */
-    .tab-nav {
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      position: sticky;
-      top: 48px;
-      z-index: 9;
-    }
-
-    .tab-nav button {
-      flex: 1;
+    .header-nav-btn {
       background: none;
       border: none;
-      border-bottom: 2px solid transparent;
       cursor: pointer;
-      padding: 10px;
-      font-size: 13.5px;
-      font-family: inherit;
+      padding: 4px 8px;
+      border-radius: 5px;
       color: var(--text-2);
+      font-size: 13px;
+      font-family: inherit;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       letter-spacing: -0.01em;
-      transition: color 0.1s, border-color 0.1s;
+      transition: color 0.12s, background 0.12s;
     }
-
-    .tab-nav button:hover { color: var(--text); }
-    .tab-nav button.active { color: var(--text); border-bottom-color: var(--text); }
+    .header-nav-btn:hover { color: var(--text); background: var(--bg-hover); }
 
     /* ── Main content ── */
     main { max-width: 840px; margin: 0 auto; padding: 48px 32px; }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .view { display: none; }
+    .view.active { display: block; }
 
     /* ── Section header ── */
     .section-header {
@@ -380,6 +371,15 @@
       color: var(--text);
     }
 
+    .dialog-description {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.55;
+      margin-top: -12px;
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
     .field { margin-bottom: 14px; }
 
     .field label {
@@ -422,6 +422,14 @@
       box-shadow: 0 0 0 2px rgba(55,53,47,0.08);
     }
 
+    .field-error {
+      font-size: 11.5px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
@@ -445,11 +453,10 @@
         margin-bottom: 16px;
       }
 
-
       /* Boulders table → card layout */
-      #tab-boulders thead { display: none; }
+      #view-projects thead { display: none; }
 
-      #tab-boulders tbody tr.data-row {
+      #view-projects tbody tr.data-row {
         display: grid;
         grid-template-columns: auto auto 1fr auto;
         grid-template-rows: auto auto auto;
@@ -459,26 +466,26 @@
         border-bottom: 1px solid var(--border-light);
       }
 
-      #tab-boulders tbody tr.data-row:last-child { border-bottom: none; }
-      #tab-boulders tbody tr.data-row:hover { background: var(--bg); }
+      #view-projects tbody tr.data-row:last-child { border-bottom: none; }
+      #view-projects tbody tr.data-row:hover { background: var(--bg); }
 
-      #tab-boulders tbody td {
+      #view-projects tbody td {
         display: block;
         padding: 0;
         border: none;
       }
 
       /* Row 1: Name | Grade | (spacer) | Status */
-      #tab-boulders tbody td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 500; align-self: center; }
-      #tab-boulders tbody td:nth-child(2) { grid-column: 2; grid-row: 1; align-self: center; }
-      #tab-boulders tbody td:nth-child(5) { grid-column: 4; grid-row: 1; align-self: center; }
+      #view-projects tbody td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 500; align-self: center; }
+      #view-projects tbody td:nth-child(2) { grid-column: 2; grid-row: 1; align-self: center; }
+      #view-projects tbody td:nth-child(5) { grid-column: 4; grid-row: 1; align-self: center; }
 
       /* Rows 2–3: Attempts then Sessions, stacked, slightly indented */
-      #tab-boulders tbody td:nth-child(3) { grid-column: 1 / span 4; grid-row: 2; font-size: 12px; color: var(--text-2); padding-left: 10px; margin-top: 6px; }
-      #tab-boulders tbody td:nth-child(4) { grid-column: 1 / span 4; grid-row: 3; font-size: 12px; color: var(--text-2); padding-left: 10px; }
+      #view-projects tbody td:nth-child(3) { grid-column: 1 / span 4; grid-row: 2; font-size: 12px; color: var(--text-2); padding-left: 10px; margin-top: 6px; }
+      #view-projects tbody td:nth-child(4) { grid-column: 1 / span 4; grid-row: 3; font-size: 12px; color: var(--text-2); padding-left: 10px; }
 
-      #tab-boulders tbody td:nth-child(3)::before,
-      #tab-boulders tbody td:nth-child(4)::before {
+      #view-projects tbody td:nth-child(3)::before,
+      #view-projects tbody td:nth-child(4)::before {
         font-size: 10.5px;
         font-weight: 500;
         color: var(--text-3);
@@ -487,8 +494,8 @@
         margin-right: 4px;
       }
 
-      #tab-boulders tbody td:nth-child(3)::before { content: "Attempts"; }
-      #tab-boulders tbody td:nth-child(4)::before { content: "Sessions"; }
+      #view-projects tbody td:nth-child(3)::before { content: "Attempts"; }
+      #view-projects tbody td:nth-child(4)::before { content: "Sessions"; }
 
       /* Session cards: restore two-section layout on mobile */
       .session-card {
@@ -561,21 +568,45 @@
 
 <header>
   <div class="logo">🪨 <span><span style="color:var(--red);font-weight:800">Red</span>point</span></div>
+  <button id="header-nav-btn" class="header-nav-btn" onclick="switchView('projects')">Projects →</button>
 </header>
-<div class="tab-nav">
-  <button class="active" onclick="switchTab('boulders', this)">Projects</button>
-  <button onclick="switchTab('sessions', this)">Sessions</button>
-</div>
 
 <main>
-  <!-- Boulders tab -->
-  <div id="tab-boulders" class="tab-panel active">
+  <!-- Session view (default) -->
+  <div id="view-session" class="view active">
+    <div class="section-header">
+      <div>
+        <div class="session-title-wrap">
+          <h2>Today's session</h2>
+          <button class="gear-btn" onclick="openSessionSettings()" title="Session settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
+        <p>Log attempts on your projects</p>
+      </div>
+      <button class="btn btn-primary" onclick="openAddProjectDialog()">+ Add project</button>
+    </div>
+    <div id="timer-section" class="timer-section" style="display:none">
+      <span class="timer-section-label">Time tracking</span>
+      <span id="timer-display" class="timer-display stopped">0:00</span>
+      <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
+    </div>
+    <div id="session-empty" class="table-wrap">
+      <div class="empty-state">
+        <strong>Session is empty</strong>
+        Add a boulder to start logging attempts.
+      </div>
+    </div>
+    <div id="session-boulders" class="session-boulders"></div>
+  </div>
+
+  <!-- Projects view (secondary) -->
+  <div id="view-projects" class="view">
     <div class="section-header">
       <div>
         <h2>Projects</h2>
-        <p>Track boulders you're working on</p>
+        <p>All boulders you've worked on</p>
       </div>
-      <button class="btn btn-primary" onclick="openAddBoulderDialog()">+ Add project</button>
     </div>
     <div class="table-wrap">
       <table>
@@ -593,7 +624,7 @@
             <td colspan="5">
               <div class="empty-state">
                 <strong>No projects yet</strong>
-                Click <span style="font-weight:600;color:var(--text-2)">Add project</span> to get started
+                Add a boulder from the session screen to get started.
               </div>
             </td>
           </tr>
@@ -601,51 +632,49 @@
       </table>
     </div>
   </div>
-
-  <!-- Sessions tab -->
-  <div id="tab-sessions" class="tab-panel">
-    <div class="section-header">
-      <div>
-        <div class="session-title-wrap">
-          <h2>Today's session</h2>
-          <button class="gear-btn" onclick="openSessionSettings()" title="Session settings">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-        </div>
-        <p>Log attempts on your projects</p>
-      </div>
-      <button class="btn btn-primary" onclick="openAddToSessionDialog()">+ Add project</button>
-    </div>
-    <div id="timer-section" class="timer-section" style="display:none">
-      <span class="timer-section-label">Time tracking</span>
-      <span id="timer-display" class="timer-display stopped">0:00</span>
-      <button id="timer-btn" class="btn btn-ghost" onclick="handleTimerBtn()">Start</button>
-    </div>
-    <div id="session-empty" class="table-wrap">
-      <div class="empty-state">
-        <strong>Session is empty</strong>
-        Add a boulder to start logging attempts.
-      </div>
-    </div>
-    <div id="session-boulders" class="session-boulders"></div>
-  </div>
 </main>
 
-<!-- Add boulder dialog -->
-<dialog id="add-boulder-dialog" tabindex="-1">
+<!-- Onboarding dialog -->
+<dialog id="onboarding-dialog" tabindex="-1">
+  <div class="dialog-inner">
+    <div class="dialog-title">Welcome to <span><span style="color:var(--red);font-weight:800">Red</span>point</span> 🪨</div>
+    <p class="dialog-description">Redpoint helps you train intentionally – think quality attempts, not just volume. Set your max attempts and minimum rest below; you can always adjust them later.</p>
+    <div class="field">
+      <label for="onboard-max-attempts">Max attempts per project</label>
+      <select id="onboard-max-attempts"></select>
+    </div>
+    <div class="field">
+      <label for="onboard-rest-time">Rest time between attempts</label>
+      <select id="onboard-rest-time">
+        <option value="1">1 minute</option>
+        <option value="2">2 minutes</option>
+        <option value="3" selected>3 minutes</option>
+        <option value="4">4 minutes</option>
+        <option value="5">5 minutes</option>
+      </select>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" onclick="confirmOnboarding()">Start session</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Add project dialog -->
+<dialog id="add-project-dialog" tabindex="-1">
   <div class="dialog-inner">
     <div class="dialog-title">Add project</div>
     <div class="field">
-      <label for="input-name">Project name</label>
-      <input id="input-name" type="text" placeholder="e.g. The Mandala" name="boulder-name" autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <label for="add-project-name">Project name</label>
+      <input id="add-project-name" type="text" placeholder="e.g. The Mandala" name="boulder-name" autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <div id="add-project-error" class="field-error">A project with this name already exists.</div>
     </div>
     <div class="field">
-      <label for="input-grade">Grade</label>
-      <select id="input-grade"></select>
+      <label for="add-project-grade">Grade</label>
+      <select id="add-project-grade"></select>
     </div>
     <div class="dialog-actions">
-      <button class="btn btn-ghost" onclick="closeAddBoulderDialog()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmAddBoulder()">Add project</button>
+      <button class="btn btn-ghost" onclick="closeAddProjectDialog()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAddProject()">Add to session</button>
     </div>
   </div>
 </dialog>
@@ -675,21 +704,6 @@
   </div>
 </dialog>
 
-<!-- Add to session dialog -->
-<dialog id="add-session-dialog" tabindex="-1">
-  <div class="dialog-inner">
-    <div class="dialog-title">Add to session</div>
-    <div class="field">
-      <label for="select-boulder">Boulder</label>
-      <select id="select-boulder"></select>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn btn-ghost" onclick="document.getElementById('add-session-dialog').close()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmAddToSession()">Add to session</button>
-    </div>
-  </div>
-</dialog>
-
 <script>
   // ── State ──
   const state = {
@@ -698,18 +712,20 @@
     settings: { maxAttempts: 5, restMinutes: 3 },
   };
 
-  // ── Populate max attempts dropdown ──
-  const maxAttemptsSelect = document.getElementById('setting-max-attempts');
-  for (let i = 1; i <= 9; i++) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = i;
-    if (i === 5) opt.selected = true;
-    maxAttemptsSelect.appendChild(opt);
-  }
+  // ── Populate max attempts dropdowns ──
+  ['setting-max-attempts', 'onboard-max-attempts'].forEach(id => {
+    const sel = document.getElementById(id);
+    for (let i = 1; i <= 9; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i;
+      if (i === 5) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  });
 
   // ── Populate grade dropdown ──
-  const gradeSelect = document.getElementById('input-grade');
+  const gradeSelect = document.getElementById('add-project-grade');
   for (let i = 0; i <= 17; i++) {
     const opt = document.createElement('option');
     opt.value = `V${i}`;
@@ -717,12 +733,18 @@
     gradeSelect.appendChild(opt);
   }
 
-  // ── Tab switching ──
-  function switchTab(name, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active'));
-    document.getElementById(`tab-${name}`).classList.add('active');
-    btn.classList.add('active');
+  // ── View switching ──
+  function switchView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+    const btn = document.getElementById('header-nav-btn');
+    if (name === 'projects') {
+      btn.textContent = '← Session';
+      btn.onclick = () => switchView('session');
+    } else {
+      btn.textContent = 'Projects →';
+      btn.onclick = () => switchView('projects');
+    }
   }
 
   // ── Render boulders table ──
@@ -803,84 +825,59 @@
     });
   }
 
-  // ── Add boulder dialog ──
-  function openAddBoulderDialog() {
-    document.getElementById('input-name').value = '';
-    document.getElementById('input-grade').value = 'V0';
-    const dialog = document.getElementById('add-boulder-dialog');
+  // ── Onboarding dialog ──
+  function openOnboardingDialog() {
+    const dialog = document.getElementById('onboarding-dialog');
     dialog.showModal();
     dialog.focus();
-    setTimeout(() => document.getElementById('input-name').focus(), 50);
   }
 
-  function closeAddBoulderDialog() {
-    document.getElementById('input-name').blur();
-    document.getElementById('add-boulder-dialog').close();
+  function confirmOnboarding() {
+    state.settings.maxAttempts = parseInt(document.getElementById('onboard-max-attempts').value, 10);
+    state.settings.restMinutes = parseInt(document.getElementById('onboard-rest-time').value, 10);
+    document.getElementById('onboarding-dialog').close();
     resetViewportZoom();
   }
 
-  function resetViewportZoom() {
-    const meta = document.querySelector('meta[name="viewport"]');
-    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
-    setTimeout(() => {
-      meta.content = 'width=device-width, initial-scale=1';
-      requestAnimationFrame(() => window.scrollTo(0, 0));
-    }, 300);
-  }
-
-  function confirmAddBoulder() {
-    const name = document.getElementById('input-name').value.trim();
-    const grade = document.getElementById('input-grade').value;
-    if (!name) {
-      document.getElementById('input-name').focus();
-      return;
-    }
-    state.boulders.push({ id: uid(), name, grade, attempts: 0, sessions: 0, sent: false });
-    closeAddBoulderDialog();
-    renderBoulders();
-  }
-
-  // ── Add to session dialog ──
-  function openAddToSessionDialog() {
-    const sel = document.getElementById('select-boulder');
-    sel.innerHTML = '';
-
-    const inSession = new Set(state.session.map(e => e.boulderId));
-    const available = state.boulders.filter(b => !inSession.has(b.id));
-
-    if (available.length === 0) {
-      const opt = document.createElement('option');
-      opt.textContent = state.boulders.length === 0
-        ? 'No boulders — add one in the Boulders tab'
-        : 'All boulders already in session';
-      opt.disabled = true;
-      sel.appendChild(opt);
-    } else {
-      available.forEach(b => {
-        const opt = document.createElement('option');
-        opt.value = b.id;
-        opt.textContent = `${b.name} (${b.grade})`;
-        sel.appendChild(opt);
-      });
-    }
-
-    const dialog = document.getElementById('add-session-dialog');
+  // ── Add project dialog ──
+  function openAddProjectDialog() {
+    document.getElementById('add-project-name').value = '';
+    document.getElementById('add-project-grade').value = 'V0';
+    document.getElementById('add-project-error').classList.remove('visible');
+    const dialog = document.getElementById('add-project-dialog');
     dialog.showModal();
     dialog.focus();
+    setTimeout(() => document.getElementById('add-project-name').focus(), 50);
   }
 
-  function confirmAddToSession() {
-    const sel = document.getElementById('select-boulder');
-    const boulderId = sel.value;
-    if (!boulderId) return;
+  function closeAddProjectDialog() {
+    document.getElementById('add-project-name').blur();
+    document.getElementById('add-project-dialog').close();
+    resetViewportZoom();
+  }
 
-    const boulder = state.boulders.find(b => b.id === boulderId);
-    if (!boulder) return;
+  function confirmAddProject() {
+    const name = document.getElementById('add-project-name').value.trim();
+    const grade = document.getElementById('add-project-grade').value;
+    const errorEl = document.getElementById('add-project-error');
 
-    state.session.push({ boulderId, attempts: 0, sent: false });
-    boulder.sessions += 1;
+    if (!name) {
+      document.getElementById('add-project-name').focus();
+      return;
+    }
 
-    document.getElementById('add-session-dialog').close();
+    if (state.boulders.find(b => b.name.toLowerCase() === name.toLowerCase())) {
+      errorEl.classList.add('visible');
+      document.getElementById('add-project-name').focus();
+      return;
+    }
+    errorEl.classList.remove('visible');
+
+    const boulder = { id: uid(), name, grade, attempts: 0, sessions: 1, sent: false };
+    state.boulders.push(boulder);
+    state.session.push({ boulderId: boulder.id, attempts: 0, sent: false });
+
+    closeAddProjectDialog();
     renderSession();
     renderBoulders();
   }
@@ -1010,12 +1007,21 @@
     renderSession();
   }
 
-  // ── Enter submits add-boulder dialog ──
-  document.getElementById('input-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') confirmAddBoulder();
+  // ── Enter submits add-project dialog ──
+  document.getElementById('add-project-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmAddProject();
   });
 
   // ── Helpers ──
+  function resetViewportZoom() {
+    const meta = document.querySelector('meta[name="viewport"]');
+    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
+    setTimeout(() => {
+      meta.content = 'width=device-width, initial-scale=1';
+      requestAnimationFrame(() => window.scrollTo(0, 0));
+    }, 300);
+  }
+
   function uid() {
     return Math.random().toString(36).slice(2, 10);
   }
@@ -1031,6 +1037,7 @@
   // ── Init ──
   renderBoulders();
   renderSession();
+  openOnboardingDialog();
 </script>
 </body>
 </html>
